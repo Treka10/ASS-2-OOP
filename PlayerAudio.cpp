@@ -1,22 +1,26 @@
+
 #include "PlayerAudio.h"
 
 PlayerAudio::PlayerAudio()
 {
     formatManager.registerBasicFormats();
-
 }
 
-void playerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
+PlayerAudio::~PlayerAudio()
+{
+}
+
+void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
-void playerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
+void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
     transportSource.getNextAudioBlock(bufferToFill);
 }
 
-void playerAudio::releaseResources()
+void PlayerAudio::releaseResources()
 {
     transportSource.releaseResources();
 }
@@ -27,7 +31,7 @@ bool PlayerAudio::loadFile(const juce::File& file)
     {
         if (auto* reader = formatManager.createReaderFor(file))
         {
-            // ?? Disconnect old source first
+            // 🔑 Disconnect old source first
             transportSource.stop();
             transportSource.setSource(nullptr);
             readerSource.reset();
@@ -43,6 +47,7 @@ bool PlayerAudio::loadFile(const juce::File& file)
             transportSource.start();
         }
     }
+
     return true;
 }
 
@@ -50,6 +55,7 @@ void PlayerAudio::start()
 {
     transportSource.start();
 }
+
 void PlayerAudio::stop()
 {
     transportSource.stop();
@@ -60,9 +66,9 @@ void PlayerAudio::setGain(float gain)
     transportSource.setGain(gain);
 }
 
-void PlayerAudio::setPosition(double positionInSeconds)
+void PlayerAudio::setPosition(double pos)
 {
-    transportSource.setPosition(positionInSeconds);
+    transportSource.setPosition(pos);
 }
 
 double PlayerAudio::getPosition() const
@@ -73,7 +79,4 @@ double PlayerAudio::getPosition() const
 double PlayerAudio::getLength() const
 {
     return transportSource.getLengthInSeconds();
-}
-
-
-
+}  
