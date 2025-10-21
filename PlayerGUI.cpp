@@ -1,4 +1,10 @@
+
 #include "PlayerGUI.h"
+
+
+
+
+
 void PlayerGUI::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     playerAudio.prepareToPlay(samplesPerBlockExpected, sampleRate);
@@ -21,7 +27,7 @@ void PlayerGUI::paint(juce::Graphics& g)
 PlayerGUI::PlayerGUI()
 {
     // Add buttons
-    for (auto* btn : { &loadButton, &restartButton , &stopButton })
+    for (auto* btn : { &loadButton, &restartButton , &stopButton , &startButton })
     {
         btn->addListener(this);
         addAndMakeVisible(btn);
@@ -33,20 +39,22 @@ PlayerGUI::PlayerGUI()
     volumeSlider.addListener(this);
     addAndMakeVisible(volumeSlider);
 }
+
 void PlayerGUI::resized()
 {
     int y = 20;
     loadButton.setBounds(20, y, 100, 40);
     restartButton.setBounds(140, y, 80, 40);
     stopButton.setBounds(240, y, 80, 40);
+	startButton.setBounds(340, y, 80, 40);
     /*prevButton.setBounds(340, y, 80, 40);
     nextButton.setBounds(440, y, 80, 40);*/
 
     volumeSlider.setBounds(20, 100, getWidth() - 40, 30);
 }
+
 PlayerGUI::~PlayerGUI()
 {
-
 }
 
 void PlayerGUI::buttonClicked(juce::Button* button)
@@ -69,13 +77,14 @@ void PlayerGUI::buttonClicked(juce::Button* button)
                 auto file = fc.getResult();
                 if (file.existsAsFile())
                 {
-                    PlayerAudio.loadFile(file);
+					playerAudio.loadFile(file);
                 }
             });
     }
 
     if (button == &restartButton)
     {
+		playerAudio.setPosition(0.0);
         playerAudio.start();
     }
 
@@ -84,9 +93,13 @@ void PlayerGUI::buttonClicked(juce::Button* button)
         playerAudio.stop();
         playerAudio.setPosition(0.0);
     }
+    if (button == &startButton) {
+
+		playerAudio.start();
+
+    }
 
 }
-
 
 void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 {
