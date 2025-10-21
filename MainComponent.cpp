@@ -1,11 +1,11 @@
 #include "MainComponent.h"
 
-
 MainComponent::MainComponent()
 {
 
+	addAndMakeVisible(player1);
+   
 
-    addAndMakevisible(player1);
     setSize(500, 250);
     setAudioChannels(0, 2);
 }
@@ -14,8 +14,6 @@ MainComponent::~MainComponent()
 {
     shutdownAudio();
 }
-
-
 
 void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
@@ -32,9 +30,13 @@ void MainComponent::releaseResources()
     player1.releaseResources();
 }
 
-void MainComponent::resized() {
-    player1.setBounds(getLocalBounds());
+void MainComponent::resized()
+{
+	player1.setBounds(getLocalBounds());
 }
+
+
+
 
 
 
