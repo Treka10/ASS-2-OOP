@@ -27,7 +27,7 @@ void PlayerGUI::paint(juce::Graphics& g)
 PlayerGUI::PlayerGUI()
 {
     // Add buttons
-    for (auto* btn : { &loadButton, &restartButton , &stopButton , &startButton })
+    for (auto* btn : { &loadButton, &restartButton , &stopButton , &startButton , &muteButton  })
     {
         btn->addListener(this);
         addAndMakeVisible(btn);
@@ -47,6 +47,8 @@ void PlayerGUI::resized()
     restartButton.setBounds(140, y, 80, 40);
     stopButton.setBounds(240, y, 80, 40);
 	startButton.setBounds(340, y, 80, 40);
+	muteButton.setBounds(340, y, 80, 40);
+
     /*prevButton.setBounds(340, y, 80, 40);
     nextButton.setBounds(440, y, 80, 40);*/
 
@@ -98,6 +100,21 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 		playerAudio.start();
 
     }
+	if (button == &muteButton)
+	{
+    	isMuted = !isMuted;
+    	if (isMuted)
+    	{
+        	playerAudio.setGain(0.0f);
+        	muteButton.setButtonText("unmute");
+    	}
+    	else
+    	{
+        	playerAudio.setGain((float)volumeSlider.getValue());
+        	muteButton.setButtonText("mute");
+		}
+	}
+
 
 }
 
@@ -106,3 +123,4 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
     if (slider == &volumeSlider)
         playerAudio.setGain((float)slider->getValue());
 }
+
