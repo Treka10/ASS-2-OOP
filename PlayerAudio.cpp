@@ -3,8 +3,10 @@
 
 PlayerAudio::PlayerAudio()
 {
-    formatManager.registerBasicFormats();
+    formatManager.registerBasicFormats();  // يضيف wav, aiff
+    formatManager.registerFormat(new juce::MP3AudioFormat(), true);  // يضيف mp3
 }
+
 
 PlayerAudio::~PlayerAudio()
 {
@@ -44,7 +46,7 @@ bool PlayerAudio::loadFile(const juce::File& file)
                 0,
                 nullptr,
                 reader->sampleRate);
-            transportSource.start();
+           // transportSource.start();
         }
     }
 
@@ -80,3 +82,9 @@ double PlayerAudio::getLength() const
 {
     return transportSource.getLengthInSeconds();
 }  
+void PlayerAudio::setLooping(bool shouldLoop)
+{
+    if (readerSource != nullptr)
+        readerSource->setLooping(shouldLoop);
+}
+
