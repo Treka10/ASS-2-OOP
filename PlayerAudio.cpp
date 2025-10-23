@@ -3,8 +3,8 @@
 
 PlayerAudio::PlayerAudio()
 {
-    formatManager.registerBasicFormats();  // يضيف wav, aiff
-    formatManager.registerFormat(new juce::MP3AudioFormat(), true);  // يضيف mp3
+    formatManager.registerBasicFormats();  
+    formatManager.registerFormat(new juce::MP3AudioFormat(), true);  
 }
 
 
@@ -33,7 +33,7 @@ bool PlayerAudio::loadFile(const juce::File& file)
     {
         if (auto* reader = formatManager.createReaderFor(file))
         {
-            // 🔑 Disconnect old source first
+           
             transportSource.stop();
             transportSource.setSource(nullptr);
             readerSource.reset();
@@ -87,4 +87,5 @@ void PlayerAudio::setLooping(bool shouldLoop)
     if (readerSource != nullptr)
         readerSource->setLooping(shouldLoop);
 }
+
 
