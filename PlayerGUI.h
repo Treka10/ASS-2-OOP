@@ -5,8 +5,8 @@ using namespace juce;
 using namespace std;
 class PlayerGUI : public juce::Component,
     public juce::Button::Listener,
-    public juce::Slider::Listener
-
+    public juce::Slider::Listener ,
+    public ListBoxModel
 {
 public:
     PlayerGUI();
@@ -19,10 +19,15 @@ public:
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
     void releaseResources();
 
+
+    int getNumRows() override;
+    void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
+    void selectedRowsChanged(int lastRowSelected) override;
+
+
 private:
     PlayerAudio playerAudio;
 
-    // GUI elements 
           TextButton loadButton{ "Load File" };
           TextButton restartButton{ "Restart" };
           TextButton stopButton{ "Stop" };
@@ -34,10 +39,15 @@ private:
           TextButton muteButton{ "mute" };
           Slider volumeSlider;
 
+          Label MetaData;
+
+          ListBox playlist;
+          Array<File> playlistAudio;
+          int currentFileIndex = -1;
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 
-    // Event handlers 
+    
     void buttonClicked(juce::Button* button) override;
     void sliderValueChanged(juce::Slider* slider) override;
     bool isLooping = false;
