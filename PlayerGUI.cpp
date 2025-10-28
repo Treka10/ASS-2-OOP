@@ -1,7 +1,7 @@
 
 #include "PlayerGUI.h"
 
-
+using namespace juce;
 
 
 
@@ -38,6 +38,15 @@ PlayerGUI::PlayerGUI()
     volumeSlider.setValue(0.5);
     volumeSlider.addListener(this);
     addAndMakeVisible(volumeSlider);
+
+    
+    MetaData.setColour(juce::Label::textColourId, juce::Colours::blue);
+    MetaData.setJustificationType(juce::Justification::centredLeft);
+    addAndMakeVisible(MetaData);
+
+    addAndMakeVisible(playlist);
+    playlist.setModel(this);
+
 }
 
 void PlayerGUI::resized()
@@ -54,6 +63,9 @@ void PlayerGUI::resized()
 	muteButton.setBounds(900, y, 60, 40);
 
     volumeSlider.setBounds(20, 100, getWidth() - 40, 30);
+
+	MetaData.setBounds(20, 150, getWidth() - 40, 100);
+	playlist.setBounds(20, 270, getWidth() - 40, getHeight() - 300);
 }
 
 PlayerGUI::~PlayerGUI()
@@ -80,7 +92,64 @@ void PlayerGUI::buttonClicked(juce::Button* button)
                 auto file = fc.getResult();
                 if (file.existsAsFile())
                 {
-					playerAudio.loadFile(file);
+                    playerAudio.loadFile(file);
+
+                    if (!playlistAudio.contains(file))
+                        playlistAudio.add(file);
+
+                    playlist.updateContent();
+
+
+                   
+                    if (auto* reader = playerAudio.getFormatManager().createReaderFor(file))
+                    {
+                        juce::String info;
+                        auto& metadata = reader->metadataValues;
+
+                        info << "File: " << file.getFileName() << "\n";
+
+                        if (metadata.size() > 0)
+                        {
+                            info << "\n---- Metadata ----\n";
+
+                            for (auto key : metadata.getAllKeys())
+                            {
+
+                                if (key.equalsIgnoreCase("ISFT"))
+                                    continue;
+
+                                juce::String readableKey = key;
+
+                                if (key.equalsIgnoreCase("TIT2") || key.equalsIgnoreCase("INAM"))
+                                    readableKey = "Title";
+                                else if (key.equalsIgnoreCase("TPE1") || key.equalsIgnoreCase("IART"))
+                                    readableKey = "Artist";
+                                else if (key.equalsIgnoreCase("TALB") || key.equalsIgnoreCase("IPRD"))
+                                    readableKey = "Album";
+                                else if (key.equalsIgnoreCase("COMM") || key.equalsIgnoreCase("ICMT"))
+                                    readableKey = "Comment";
+
+                                info << readableKey << ": " << metadata[key] << "\n";
+                            }
+
+                            info << "-------------------\n";
+                        }
+                        else
+                        {
+                            info << "No metadata found.\n";
+                        }
+
+                        double lengthInSeconds = reader->lengthInSamples / reader->sampleRate;
+                        info << "Length: " << juce::String(lengthInSeconds, 2) << " sec\n";
+
+                        MetaData.setText(info, juce::dontSendNotification);
+						
+                        delete reader;
+                    }
+
+
+
+
                 }
             });
     }
@@ -88,7 +157,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     if (button == &restartButton)
     {
         playerAudio.stop();
-		playerAudio.setPosition(0.0);
+        playerAudio.setPosition(0.0);
         playerAudio.start();
     }
 
@@ -97,40 +166,42 @@ void PlayerGUI::buttonClicked(juce::Button* button)
         playerAudio.stop();
         playerAudio.setPosition(0.0);
     }
-    if (button == &startButton) {
 
-		playerAudio.start();
+    if (button == &startButton)
+    {
+        playerAudio.start();
+    }
 
+    if (button == &pauseButton)
+    {
+        playerAudio.stop();
     }
-    if (button == &pauseButton) {
-		playerAudio.stop();
 
+    if (button == &GoToStartButton)
+    {
+        playerAudio.setPosition(0.0);
     }
-    if (button == &GoToStartButton) {
-		playerAudio.setPosition(0.0);
-    }
-    if (button == &GoToEndButton) {
-		playerAudio.setPosition(playerAudio.getLength());
 
+    if (button == &GoToEndButton)
+    {
+        playerAudio.setPosition(playerAudio.getLength());
     }
+
     if (button == &LoopButton)
     {
         isLooping = !isLooping;
         playerAudio.setLooping(isLooping);
 
         if (isLooping)
-        {
             LoopButton.setButtonText("Looping");
-        }
         else
-        {
             LoopButton.setButtonText("Loop ()");
-        }
     }
 
     if (button == &muteButton)
     {
         isMuted = !isMuted;
+
         if (isMuted)
         {
             playerAudio.setGain(0.0f);
@@ -142,12 +213,87 @@ void PlayerGUI::buttonClicked(juce::Button* button)
             muteButton.setButtonText("mute");
         }
     }
-
-
 }
-
 void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 {
     if (slider == &volumeSlider)
         playerAudio.setGain((float)slider->getValue());
 }
+
+int PlayerGUI::getNumRows()
+{
+    return playlistAudio.size();
+}
+
+void PlayerGUI::paintListBoxItem(int rowNumber, juce::Graphics& G, int W, int H, bool SelectAudio)
+{
+    if (SelectAudio)
+        G.fillAll(Colours::lightblue);
+    else
+        G.fillAll(Colours::grey);
+
+    if (rowNumber < playlistAudio.size())
+    {
+        G.setColour(Colours::white);
+        G.drawText(playlistAudio[rowNumber].getFileName(),
+            10, 0, W - 10, H,
+            juce::Justification::centredLeft);
+    }
+}
+
+void PlayerGUI::selectedRowsChanged(int lastRowSelected)
+{
+    if (lastRowSelected >= 0 && lastRowSelected < playlistAudio.size())
+    {
+        currentFileIndex = lastRowSelected;
+        auto file = playlistAudio[currentFileIndex];
+
+        playerAudio.loadFile(file);
+
+        if (auto* reader = playerAudio.getFormatManager().createReaderFor(file))
+        {
+            juce::String info;
+            auto& metadata = reader->metadataValues;
+
+            info << "File: " << file.getFileName() << "\n";
+
+            if (metadata.size() > 0)
+            {
+                info << "\n---- Metadata ----\n";
+
+                for (auto key : metadata.getAllKeys())
+                {
+                    if (key.equalsIgnoreCase("ISFT"))
+                        continue;
+
+                    juce::String readableKey = key;
+
+                    if (key.equalsIgnoreCase("TIT2") || key.equalsIgnoreCase("INAM"))
+                        readableKey = "Title";
+                    else if (key.equalsIgnoreCase("TPE1") || key.equalsIgnoreCase("IART"))
+                        readableKey = "Artist";
+                    else if (key.equalsIgnoreCase("TALB") || key.equalsIgnoreCase("IPRD"))
+                        readableKey = "Album";
+                    else if (key.equalsIgnoreCase("COMM") || key.equalsIgnoreCase("ICMT"))
+                        readableKey = "Comment";
+
+                    info << readableKey << ": " << metadata[key] << "\n";
+                }
+
+                info << "-------------------\n";
+            }
+            else
+            {
+                info << "No metadata found.\n";
+            }
+
+            double lengthInSeconds = reader->lengthInSamples / reader->sampleRate;
+            info << "Length: " << juce::String(lengthInSeconds, 2) << " sec\n";
+
+            MetaData.setText(info, juce::dontSendNotification);
+
+            delete reader;
+        }
+    }
+}
+
