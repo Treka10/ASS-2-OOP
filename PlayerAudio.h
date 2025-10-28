@@ -1,6 +1,6 @@
 #pragma once       // PlayerAudio.h 
 #include <JuceHeader.h> 
-
+using namespace juce;
 class PlayerAudio
 {
 public:
@@ -20,10 +20,12 @@ public:
     double getLength() const;
     void setLooping(bool shouldLoop);
 
+	AudioFormatManager& getFormatManager() { return formatManager; }
+
 private:
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
 
-    // JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio) 
+     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio) 
 };
