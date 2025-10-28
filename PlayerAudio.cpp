@@ -33,20 +33,16 @@ bool PlayerAudio::loadFile(const juce::File& file)
     {
         if (auto* reader = formatManager.createReaderFor(file))
         {
-           
             transportSource.stop();
             transportSource.setSource(nullptr);
             readerSource.reset();
 
-            
             readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
 
-            
-            transportSource.setSource(readerSource.get(),
-                0,
-                nullptr,
-                reader->sampleRate);
-           // transportSource.start();
+            transportSource.setSource(readerSource.get(), 0,nullptr,  reader->sampleRate);
+
+
+
         }
     }
 
@@ -87,6 +83,4 @@ void PlayerAudio::setLooping(bool shouldLoop)
     if (readerSource != nullptr)
         readerSource->setLooping(shouldLoop);
 }
-
-
 
