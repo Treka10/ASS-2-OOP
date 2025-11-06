@@ -39,24 +39,24 @@ PlayerGUI::PlayerGUI()
     volumeSlider.addListener(this);
     addAndMakeVisible(volumeSlider);
 	
-	speedlabel.setText("Speed", juce::dontSendNotification); 
-	speedlabel.setJustificationType(juce::Justification::centred); 
-	addAndMakeVisible(speedlabel);
+	speedlabel.setText("Speed", juce::dontSendNotification); //+
+	speedlabel.setJustificationType(juce::Justification::centred);//+ 
+	addAndMakeVisible(speedlabel);//+
 	
-	addAndMakeVisible(speedSlider);
-	speedSlider.setRange(0.5, 2.0, 0.01);
-	speedSlider.setValue(1.0);
-	speedSlider.addListener(this);
+	addAndMakeVisible(speedSlider);//+
+	speedSlider.setRange(0.5, 2.0, 0.01);//+
+	speedSlider.setValue(1.0);//+
+	speedSlider.addListener(this);//+
 
-	addAndMakeVisible(progressBar); 
-	progressBar.setPercentageDisplay(false);
+	addAndMakeVisible(progressBar); //+
+	progressBar.setPercentageDisplay(false);//+
 
-	addAndMakeVisible(timeLabel); 
-	timeLabel.setJustificationType(juce::Justification::centred);
-	timeLabel.setColour(juce::Label::textColourId, juce::Colours::white); 
+	addAndMakeVisible(timeLabel); //+
+	timeLabel.setJustificationType(juce::Justification::centred);//+
+	timeLabel.setColour(juce::Label::textColourId, juce::Colours::white);//+ 
 
-	setSize(600, 300);
-	startTimerHz(30); 
+	setSize(600, 300);//+
+	startTimerHz(30); //+
     MetaData.setColour(juce::Label::textColourId, juce::Colours::blue);
     MetaData.setJustificationType(juce::Justification::centredLeft);
     addAndMakeVisible(MetaData);
@@ -80,11 +80,11 @@ void PlayerGUI::resized()
 	muteButton.setBounds(900, y, 60, 40);
 
     volumeSlider.setBounds(20, 100, getWidth() - 40, 30);
-	speedlabel.setBounds(20, 140, 60, 30); 
-	speedSlider.setBounds(90, 140, getWidth() - 110, 30);
+	speedlabel.setBounds(20, 140, 60, 30); //+
+	speedSlider.setBounds(90, 140, getWidth() - 110, 30);//+
 
-	progressBar.setBounds(20, 200, getWidth() - 40, 6); 
-	timeLabel.setBounds(20, 230, getWidth() - 40, 20); 
+	progressBar.setBounds(20, 200, getWidth() - 40, 6);//+ 
+	timeLabel.setBounds(20, 230, getWidth() - 40, 20); //+
 	
 	MetaData.setBounds(20, 150, getWidth() - 40, 100);
 	playlist.setBounds(20, 270, getWidth() - 40, getHeight() - 300);
@@ -240,42 +240,42 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 {
     if (slider == &volumeSlider)
         playerAudio.setGain((float)slider->getValue());
-	else if (slider == &speedSlider)
+	else if (slider == &speedSlider)//+
 	{
-		playerAudio.setSpeed(slider->getValue());
+		playerAudio.setSpeed(slider->getValue());//+
 	}
 }
-void PlayerGUI::setSpeedSliderValue(double speed)
+void PlayerGUI::setSpeedSliderValue(double speed)//+
 {
-    speedSlider.setValue(speed);
+    speedSlider.setValue(speed);//+
 }
-void PlayerGUI::timerCallback()
+void PlayerGUI::timerCallback()//+
 {
-    double position = playerAudio.getPosition(); 
-    double length = playerAudio.getLength();     
+    double position = playerAudio.getPosition(); //+
+    double length = playerAudio.getLength();     //+
 
-    if (length > 0)
+    if (length > 0)//+
     {
-        progress = position / length;
+        progress = position / length;//+
 
-        int currentMinutes = static_cast<int>(position) / 60;
-        int currentSeconds = static_cast<int>(position) % 60;
-        int totalMinutes = static_cast<int>(length) / 60;
-        int totalSeconds = static_cast<int>(length) % 60;
+        int currentMinutes = static_cast<int>(position) / 60;//+
+        int currentSeconds = static_cast<int>(position) % 60;//+
+        int totalMinutes = static_cast<int>(length) / 60;//+
+        int totalSeconds = static_cast<int>(length) % 60;//+
 
-        juce::String timeText = juce::String::formatted("%d:%02d / %d:%02d",
+        juce::String timeText = juce::String::formatted("%d:%02d / %d:%02d",//+
             currentMinutes, currentSeconds,
-            totalMinutes, totalSeconds);
+            totalMinutes, totalSeconds);//+
 
-        timeLabel.setText(timeText, juce::dontSendNotification);
+        timeLabel.setText(timeText, juce::dontSendNotification);//+
     }
     else
     {
-        progress = 0.0;
-        timeLabel.setText("0:00 / 0:00", juce::dontSendNotification);
+        progress = 0.0;//+
+        timeLabel.setText("0:00 / 0:00", juce::dontSendNotification);//+
     }
 
-    repaint();
+    repaint();//+
 }
 
 int PlayerGUI::getNumRows()
@@ -354,5 +354,6 @@ void PlayerGUI::selectedRowsChanged(int lastRowSelected)
         }
     }
 }
+
 
 
