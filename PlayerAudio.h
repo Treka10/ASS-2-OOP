@@ -19,7 +19,7 @@ public:
     double getPosition() const;
     double getLength() const;
     void setLooping(bool shouldLoop);
-	void setSpeed(double ratio);
+    void setSpeed(double ratio);
 
 	AudioFormatManager& getFormatManager() { return formatManager; }
 
@@ -27,8 +27,9 @@ private:
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
-	std::unique_ptr<juce::ResamplingAudioSource> resampleSource;
-	double currentSpeed = 1.0;
+    std::unique_ptr<juce::ResamplingAudioSource> resampleSource;
+    double currentSpeed = 1.0;
+
+
      JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio) 
 };
-
