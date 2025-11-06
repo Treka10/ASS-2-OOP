@@ -6,7 +6,8 @@ using namespace std;
 class PlayerGUI : public juce::Component,
     public juce::Button::Listener,
     public juce::Slider::Listener ,
-    public ListBoxModel
+    public ListBoxModel ,
+	public juce::Timer
 {
 public:
     PlayerGUI();
@@ -23,6 +24,7 @@ public:
     int getNumRows() override;
     void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
     void selectedRowsChanged(int lastRowSelected) override;
+	void timerCallback() override;
 
 
 private:
@@ -38,7 +40,11 @@ private:
 		  TextButton LoopButton{ "Loop ()" };
           TextButton muteButton{ "mute" };
           Slider volumeSlider;
-
+		  Slider speedSlider;
+		  Label speedlabel;
+		  double progress = 0.0;
+	      ProgressBar progressBar{ progress }; 
+		  Label timeLabel;
           Label MetaData;
 
           ListBox playlist;
@@ -50,8 +56,10 @@ private:
     
     void buttonClicked(juce::Button* button) override;
     void sliderValueChanged(juce::Slider* slider) override;
+	void setSpeedSliderValue(double speed) ;
     bool isLooping = false;
     bool isMuted = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };
+
