@@ -5,7 +5,7 @@ PlayerAudio::PlayerAudio()
 {
     formatManager.registerBasicFormats();  
     formatManager.registerFormat(new juce::MP3AudioFormat(), true);  
-    resampleSource = std::make_unique<juce::ResamplingAudioSource>(&transportSource, false); //+
+    resampleSource = std::make_unique<juce::ResamplingAudioSource>(&transportSource, false ,2); //+
 }
 
 
@@ -16,19 +16,21 @@ PlayerAudio::~PlayerAudio()
 void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+	resampleSource = std::make_unique<juce::ResamplingAudioSource>(&transportSource, false, 2);//+9
     resampleSource->prepareToPlay(samplesPerBlockExpected, sampleRate);//+ 
 
 }
 
 void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    // transportSource.getNextAudioBlock(bufferToFill);//+
-    resampleSource->getNextAudioBlock(bufferToFill); //+
+    if (resampleSource)
+        resampleSource->getNextAudioBlock(bufferToFill);
 }
 
 void PlayerAudio::releaseResources()
 {
     transportSource.releaseResources();
+	if(resampleSource)
     resampleSource->releaseResources();//+
 }
 
@@ -99,6 +101,7 @@ void PlayerAudio::setSpeed(double ratio) //+
         resampleSource->setResamplingRatio(currentSpeed);//+
 	}
 }
+
 
 
 
